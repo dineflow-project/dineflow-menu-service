@@ -1,4 +1,4 @@
-FROM golang:1.16-alpine
+FROM golang:1.18-alpine
 WORKDIR /app
 
 # add some necessary packages
@@ -12,7 +12,7 @@ COPY ./go.mod go.sum ./
 RUN go mod download && go mod verify
 
 # Install Compile Daemon for go. We'll use it to watch changes in go files
-RUN go get github.com/githubnemo/CompileDaemon
+RUN go install -mod=mod github.com/githubnemo/CompileDaemon
 
 # Copy and build the app
 COPY . .

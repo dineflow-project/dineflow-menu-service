@@ -6,9 +6,8 @@ import (
 	"net/http"
 	"os"
 
-	// "github.com/gin-gonic/gin"
-
 	"dineflow-menu-services/configs"
+	"dineflow-menu-services/models"
 	"dineflow-menu-services/routes"
 
 	"github.com/joho/godotenv"
@@ -24,6 +23,10 @@ func main() {
 	}
 
 	configs.ConnectDB()
+	if err := models.AutoMigrateDB(); err != nil {
+		log.Fatal("Database migration error:", err)
+	}
+
 	router := mux.NewRouter()
 	routes.ProtectedRoute(router)
 	log.Fatal(http.ListenAndServe(":"+os.Getenv("PORT"), nil))

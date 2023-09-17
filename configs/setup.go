@@ -4,8 +4,8 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"os"
 
-	// "github.com/gin-gonic/gin"
 	_ "github.com/go-sql-driver/mysql"
 )
 
@@ -13,12 +13,11 @@ var Db *sql.DB
 var err error
 
 func ConnectDB() {
-	Db, err = sql.Open("mysql", "menu:root@tcp(db:3306)/menu_services_db")
+	Db, err = sql.Open(os.Getenv("MYSQL_DRIVER"), os.Getenv("MYSQL_SOURCE"))
 	if err != nil {
 		log.Print(err.Error())
 	}
 	// defer Db.Close()
-
 	fmt.Println("Connected to MySQL")
 	// return Db
 }

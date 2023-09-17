@@ -32,7 +32,6 @@ type Vendor struct {
 }
 
 func GetAllVendors(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("Connected to MySQL")
 	results, err := configs.Db.Query("SELECT * FROM vendors")
 	if err != nil {
 		panic(err.Error())

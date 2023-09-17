@@ -80,8 +80,6 @@ func CreateCanteen(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer r.Body.Close()
-	fmt.Println(newCanteen)
-	fmt.Println(newCanteen.Name)
 
 	// Perform the INSERT operation, assuming you have a table structure similar to your Canteen struct
 	_, err := configs.Db.Exec("INSERT INTO canteens (Name) VALUES (?)", newCanteen.Name)

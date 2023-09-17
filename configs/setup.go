@@ -17,7 +17,7 @@ func ConnectDB() {
 	if err != nil {
 		log.Print(err.Error())
 	}
-	defer Db.Close()
+	// defer Db.Close()
 
 	fmt.Println("Connected to MySQL")
 	// return Db

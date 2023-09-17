@@ -18,7 +18,7 @@ type Canteen struct {
 	Name string `json:"name"`
 }
 
-func getAllCanteens(w http.ResponseWriter, r *http.Request) {
+func GetAllCanteens(w http.ResponseWriter, r *http.Request) {
 	// Query the database to get all canteens
 	rows, err := configs.Db.Query("SELECT ID, Name FROM canteens")
 	if err != nil {
@@ -48,7 +48,7 @@ func getAllCanteens(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(canteens)
 }
 
-func getCanteenByID(w http.ResponseWriter, r *http.Request) {
+func GetCanteenByID(w http.ResponseWriter, r *http.Request) {
 	// Get the canteen ID from the URL path parameters
 	vars := mux.Vars(r)
 	canteenID := vars["id"]
@@ -71,7 +71,7 @@ func getCanteenByID(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(canteen)
 }
 
-func createCanteen(w http.ResponseWriter, r *http.Request) {
+func CreateCanteen(w http.ResponseWriter, r *http.Request) {
 	// Parse the incoming JSON request body
 	var newCanteen Canteen
 	decoder := json.NewDecoder(r.Body)
@@ -95,7 +95,7 @@ func createCanteen(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, "Canteen created successfully")
 }
 
-func deleteCanteenById(w http.ResponseWriter, r *http.Request) {
+func DeleteCanteenById(w http.ResponseWriter, r *http.Request) {
 	// Get the canteen ID from the URL path parameters
 	vars := mux.Vars(r)
 	canteenID := vars["id"]
@@ -111,7 +111,7 @@ func deleteCanteenById(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, "Canteen deleted successfully")
 }
 
-func updateCanteenById(w http.ResponseWriter, r *http.Request) {
+func UpdateCanteenById(w http.ResponseWriter, r *http.Request) {
 	// Get the canteen ID from the URL path parameters
 	vars := mux.Vars(r)
 	canteenID := vars["id"]

@@ -31,7 +31,7 @@ type Vendor struct {
 	Status           Status       `json:"status"`
 }
 
-func getAllVendors(w http.ResponseWriter, r *http.Request) {
+func GetAllVendors(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Connected to MySQL")
 	results, err := configs.Db.Query("SELECT * FROM vendors")
 	if err != nil {
@@ -53,7 +53,7 @@ func getAllVendors(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(vendors)
 }
 
-func getVendorByID(w http.ResponseWriter, r *http.Request) {
+func GetVendorByID(w http.ResponseWriter, r *http.Request) {
 	// Get the vendor ID from the URL path parameters
 	vars := mux.Vars(r)
 	vendorID := vars["id"]
@@ -76,7 +76,7 @@ func getVendorByID(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(vendor)
 }
 
-func createVendor(w http.ResponseWriter, r *http.Request) {
+func CreateVendor(w http.ResponseWriter, r *http.Request) {
 	// Parse the JSON data from the request body into a VendorRequest struct
 	var vendorRequest Vendor
 	err := json.NewDecoder(r.Body).Decode(&vendorRequest)
@@ -98,7 +98,7 @@ func createVendor(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Vendor created successfully")
 }
 
-func deleteVendorById(w http.ResponseWriter, r *http.Request) {
+func DeleteVendorById(w http.ResponseWriter, r *http.Request) {
 	// Get the canteen ID from the URL path parameters
 	vars := mux.Vars(r)
 	vendorID := vars["id"]
@@ -115,7 +115,7 @@ func deleteVendorById(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func updateVendorById(w http.ResponseWriter, r *http.Request) {
+func UpdateVendorById(w http.ResponseWriter, r *http.Request) {
 	// Get the vendor ID from the URL path parameters
 	vars := mux.Vars(r)
 	vendorID := vars["id"]

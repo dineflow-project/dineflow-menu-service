@@ -7,12 +7,13 @@ services:
     build:
       context: .
       dockerfile: db.Dockerfile
+    # image: mysql:8.0.23
     networks:
       - default
     restart: always
     ports:
       # <Port exposed> : < MySQL Port running inside container>
-      - "3307:3306"
+      - "3306:3306"
     env_file:
       - ./.env
 

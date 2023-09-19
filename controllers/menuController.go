@@ -79,10 +79,8 @@ func CreateMenu(w http.ResponseWriter, r *http.Request) {
 func DeleteMenuByID(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	menuID := vars["id"]
-    fmt.Fprintln(menuID)
 
 	err := models.DeleteMenuByID(menuID)
-    fmt.Fprintln(err)
 	if err != nil {
 		log.Print(err.Error())
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -105,7 +103,7 @@ func UpdateMenuByID(w http.ResponseWriter, r *http.Request) {
 	}
 	defer r.Body.Close()
 
-	err := models.UpdateMenuByID(MenuID, updatedMenu)
+	err := models.UpdateMenuByID(menuID, updatedMenu)
 	if err != nil {
 		log.Print(err.Error())
 		http.Error(w, err.Error(), http.StatusInternalServerError)

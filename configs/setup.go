@@ -18,7 +18,8 @@ func ConnectDB() {
 	Db, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
 		log.Print(err.Error())
+	} else {
+		fmt.Println("Connected to MySQL")
 	}
 
-	fmt.Println("Connected to MySQL")
 }

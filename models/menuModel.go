@@ -1,30 +1,26 @@
 package models
 
-
 import (
-	"fmt"
 	"dineflow-menu-services/configs"
+	"fmt"
 
 	_ "github.com/go-sql-driver/mysql"
-
 )
 
-
 const (
-	Available  Status = "Available"
+	Available   Status = "Available"
 	Unavailable Status = "Unavailable"
 )
 
 type Menu struct {
-	ID               int          `json:"id"`
-	VendorID		 int          `json:"vendor_id"`
-	Name             string       `json:"name"`
-	Price			 float32	  `json:"price"`
-	ImagePath		 string		  `json:"image_path"`
-	Description		 string		  `json:"description"`
-	Status           Status       `json:"status"`
+	ID          int     `json:"id"`
+	VendorID    int     `json:"vendor_id"`
+	Name        string  `json:"name"`
+	Price       float32 `json:"price"`
+	ImagePath   string  `json:"image_path"`
+	Description string  `json:"description"`
+	Status      Status  `json:"status"`
 }
-
 
 func GetAllMenus() ([]Menu, error) {
 	var menus []Menu
@@ -38,7 +34,7 @@ func GetAllMenus() ([]Menu, error) {
 func GetAllMenusByVendorID(vendorID string) (Menu, error) {
 	var menus Menu
 	if err := configs.Db.Where("vendor_id = ?", vendorID).Find(&menus).Error; err != nil {
-		return nil, err
+		return Menu{}, err
 	}
 
 	return menus, nil
@@ -88,12 +84,10 @@ func CreateMenu(menu Menu) error {
 
 func DeleteMenuByID(menuID string) error {
 	result := configs.Db.Delete(&Menu{}, menuID)
-	fmt.Fprintln(result)
 
 	if result.RowsAffected == 0 {
 		return fmt.Errorf("the menu id could not be founded")
 	}
-	fmt.Fprintln(result)
 	if result.Error != nil {
 		return result.Error
 	}

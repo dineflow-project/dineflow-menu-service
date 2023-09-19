@@ -16,5 +16,9 @@ func AutoMigrateDB() error {
 		return err
 	}
 
+	// Auto-migrate the Menu model
+	if err := configs.Db.AutoMigrate(&Menu{}); err != nil {
+		return err
+	}
 	return nil
 }

@@ -1,0 +1,38 @@
+version: '3.7'
+
+services:
+  db:
+    container_name: "menu_services_db"
+    platform: linux/x86_64
+    build:
+      context: .
+      dockerfile: db.Dockerfile
+    networks:
+      - default
+    restart: always
+    ports:
+      # <Port exposed> : < MySQL Port running inside container>
+      - "3306:3306"
+    env_file:
+      - ./.env
+
+    volumes:
+      - database:/var/lib/mysql
+    command: --default-authentication-plugin=mysql_native_password
+  api:
+    container_name:  "api"
+    build:
+      context: .
+      dockerfile: api.Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+
+    volumes:
+      - .:/app/
+
+networks:
+  default:
+volumes:
+  database:

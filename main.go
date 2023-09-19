@@ -23,12 +23,11 @@ func main() {
 	}
 
 	configs.ConnectDB()
-	if err := models.AutoMigrateDB(); err != nil {
-		log.Fatal("Database migration error:", err)
+	if errMg := models.AutoMigrateDB(); errMg != nil {
+		log.Fatal("Database migration error:", errMg)
 	}
 
 	router := mux.NewRouter()
 	routes.ProtectedRoute(router)
 	log.Fatal(http.ListenAndServe(":"+os.Getenv("PORT"), nil))
-
 }

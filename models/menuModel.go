@@ -78,8 +78,8 @@ func CreateMenu(menu Menu) error {
 	if errr != nil {
 		return errr
 	}
-
 	return nil
+
 }
 
 func DeleteMenuByID(menuID string) error {

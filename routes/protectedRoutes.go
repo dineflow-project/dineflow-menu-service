@@ -24,7 +24,7 @@ func ProtectedRoute(r *mux.Router) {
 	r.HandleFunc("/menus", controllers.CreateMenu).Methods("POST")
 	r.HandleFunc("/menus/vendors/{id:[0-9]+}", controllers.GetAllMenusByVendorID).Methods("GET")
 	r.HandleFunc("/menus/{id:[0-9]+}", controllers.DeleteMenuByID).Methods("DELETE")
-	
+	r.HandleFunc("/menus/{id:[0-9]+}", controllers.UpdateMenuByID).Methods("PUT", "PATCH")
 
 	http.Handle("/", r)
 }

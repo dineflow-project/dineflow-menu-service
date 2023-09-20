@@ -32,6 +32,10 @@ func GetAllMenusByVendorID(w http.ResponseWriter, r *http.Request) {
 
     menus, err := models.GetAllMenusByVendorID(vendorID)
     if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			http.Error(w, "Menu not found", http.StatusNotFound)
+			return
+		}
         log.Print(err.Error())
         http.Error(w, err.Error(), http.StatusInternalServerError)
         return
@@ -57,6 +61,7 @@ func GetMenuByID(w http.ResponseWriter, r *http.Request) {
     json.NewEncoder(w).Encode(menu)
 }
 
+
 func CreateMenu(w http.ResponseWriter, r *http.Request) {
     var menuRequest models.Menu
     err := json.NewDecoder(r.Body).Decode(&menuRequest)
@@ -68,13 +73,20 @@ func CreateMenu(w http.ResponseWriter, r *http.Request) {
     err = models.CreateMenu(menuRequest)
     if err != nil {
         log.Print(err.Error())
-        http.Error(w, "Database error", http.StatusInternalServerError)
+
+        // Handle the specific error returned from the model
+        if models.IsVendorNotFoundError(err) {
+            http.Error(w, err.Error(), http.StatusBadRequest)
+        } else {
+            http.Error(w, "Database error", http.StatusInternalServerError)
+        }
         return
     }
 
     w.WriteHeader(http.StatusCreated)
     fmt.Fprintf(w, "Menu created successfully")
 }
+
 
 func DeleteMenuByID(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)

@@ -41,6 +41,25 @@ func GetVendorByID(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(vendor)
 }
 
+func GetAllVendorsByCanteenID(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	canteenID := vars["id"]
+
+	menus, err := models.GetAllVendorsByCanteenID(canteenID)
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			http.Error(w, "Vendor not found", http.StatusNotFound)
+			return
+		}
+		log.Print(err.Error())
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(menus)
+}
+
 func CreateVendor(w http.ResponseWriter, r *http.Request) {
 	var vendorRequest models.Vendor
 	err := json.NewDecoder(r.Body).Decode(&vendorRequest)
@@ -51,8 +70,12 @@ func CreateVendor(w http.ResponseWriter, r *http.Request) {
 
 	err = models.CreateVendor(vendorRequest)
 	if err != nil {
-		log.Print(err.Error())
-		http.Error(w, "Database error", http.StatusInternalServerError)
+		if err == gorm.ErrRecordNotFound {
+			http.Error(w, "Cannot create vendor: canteen_id does not exist", http.StatusInternalServerError)
+		} else {
+			log.Print(err.Error())
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
 		return
 	}
 

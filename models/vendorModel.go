@@ -36,19 +36,32 @@ func GetAllVendors() ([]Vendor, error) {
 	return vendors, nil
 }
 
-func GetVendorByID(vendorID string) (Vendor, error) {
-	var vendor Vendor
+func GetVendorByID(vendorID string) ([]Vendor, error) {
+	var vendor []Vendor
 	result := configs.Db.Where("id = ?", vendorID).First(&vendor)
 	if result.RowsAffected == 0 {
-		return Vendor{}, fmt.Errorf("the vendor id could not be found")
+		return nil, fmt.Errorf("the vendor id could not be found")
 	}
 	if result.Error != nil {
-		return Vendor{}, result.Error
+		return nil, result.Error
 	}
 	return vendor, nil
 }
 
+func GetAllVendorsByCanteenID(canteenID string) ([]Vendor, error) {
+	var vendor []Vendor
+	if err := configs.Db.Where("canteen_id = ?", canteenID).Find(&vendor).Error; err != nil {
+		return nil, err
+	}
+
+	return vendor, nil
+}
+
 func CreateVendor(vendor Vendor) error {
+	var canteen Canteen
+	if err := configs.Db.Where("id = ?", vendor.CanteenID).First(&canteen).Error; err != nil {
+		return err
+	}
 	err := configs.Db.Create(&vendor).Error
 	if err != nil {
 		return err

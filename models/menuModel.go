@@ -7,11 +7,6 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-const (
-	Available   Status = "Available"
-	Unavailable Status = "Unavailable"
-)
-
 type Menu struct {
 	ID          int     `json:"id"`
 	VendorID    int     `json:"vendor_id"`
@@ -19,7 +14,7 @@ type Menu struct {
 	Price       float32 `json:"price"`
 	ImagePath   string  `json:"image_path"`
 	Description string  `json:"description"`
-	Status      Status  `json:"status"`
+    IsAvailable bool    `json:"is_available"`
 }
 
 func GetAllMenus() ([]Menu, error) {

@@ -19,8 +19,8 @@ services:
 
     volumes:
       - database:/var/lib/mysql
-    # command: --default-authentication-plugin=mysql_native_password
-    command: --bind-address=0.0.0.0
+    command: --default-authentication-plugin=caching_sha2_password
+    # command: --bind-address=0.0.0.0
   # api:
   #   container_name: "api"
   #   build:
@@ -33,8 +33,8 @@ services:
   #   depends_on:
   #     - db
 
-  #   volumes:
-  #     - .:/app/
+    # volumes:
+    #   - .:/app/
 
 networks:
   menu_network:

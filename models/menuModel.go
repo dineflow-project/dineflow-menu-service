@@ -14,12 +14,30 @@ type Menu struct {
 	Price       float32 `json:"price"`
 	ImagePath   string  `json:"image_path"`
 	Description string  `json:"description"`
-    IsAvailable bool    `json:"is_available"`
+	IsAvailable bool    `json:"is_available"`
 }
 
-func GetAllMenus() ([]Menu, error) {
+func GetAllMenus(canteenName, vendorName string, minprice, maxprice float64) ([]Menu, error) {
 	var menus []Menu
-	if err := configs.Db.Find(&menus).Error; err != nil {
+	query := configs.Db.Table("menus").
+		Select("menus.*").
+		Joins("join vendors on menus.vendor_id = vendors.id").
+		Joins("join canteens on vendors.canteen_id = canteens.id")
+
+	if canteenName != "" {
+		query = query.Where("canteens.name = ?", canteenName)
+	}
+	if vendorName != "" {
+		query = query.Where("vendors.name = ?", vendorName)
+	}
+	if minprice > 0 {
+		query = query.Where("menus.price >= ?", minprice)
+	}
+	if maxprice > 0 {
+		query = query.Where("menus.price <= ?", maxprice)
+	}
+
+	if err := query.Find(&menus).Error; err != nil {
 		return nil, err
 	}
 
@@ -35,7 +53,6 @@ func GetAllMenusByVendorID(vendorID string) ([]Menu, error) {
 	return menus, nil
 }
 
-
 func GetMenuByID(menuID string) (Menu, error) {
 	var menu Menu
 	result := configs.Db.Where("id = ?", menuID).First(&menu)
@@ -50,35 +67,34 @@ func GetMenuByID(menuID string) (Menu, error) {
 
 // Function to create a menu item
 type VendorNotFoundError struct {
-    VendorID int
+	VendorID int
 }
 
 func (e VendorNotFoundError) Error() string {
-    return fmt.Sprintf("Vendor with ID %d does not exist", e.VendorID)
+	return fmt.Sprintf("Vendor with ID %d does not exist", e.VendorID)
 }
 
 func IsVendorNotFoundError(err error) bool {
-    _, ok := err.(VendorNotFoundError)
-    return ok
+	_, ok := err.(VendorNotFoundError)
+	return ok
 }
 
 func CreateMenu(menu Menu) error {
-    // Check if the vendor exists
-    var vendorCount int64
-    if err := configs.Db.Model(&Vendor{}).Where("id = ?", menu.VendorID).Count(&vendorCount).Error; err != nil {
-        return err
-    }
+	// Check if the vendor exists
+	var vendorCount int64
+	if err := configs.Db.Model(&Vendor{}).Where("id = ?", menu.VendorID).Count(&vendorCount).Error; err != nil {
+		return err
+	}
 
-    if vendorCount == 0 {
-        // Return a specific error indicating that the vendor does not exist
-        return VendorNotFoundError{VendorID: menu.VendorID}
-    }
+	if vendorCount == 0 {
+		// Return a specific error indicating that the vendor does not exist
+		return VendorNotFoundError{VendorID: menu.VendorID}
+	}
 
-    // The vendor exists, so create the menu item
-    err := configs.Db.Create(&menu).Error
-    return err
+	// The vendor exists, so create the menu item
+	err := configs.Db.Create(&menu).Error
+	return err
 }
-
 
 func DeleteMenuByID(menuID string) error {
 	result := configs.Db.Delete(&Menu{}, menuID)

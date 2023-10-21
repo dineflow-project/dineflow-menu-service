@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
@@ -13,7 +14,13 @@ import (
 )
 
 func GetAllMenus(w http.ResponseWriter, r *http.Request) {
-	results, err := models.GetAllMenus()
+	canteen := r.URL.Query().Get("canteen")
+	vendor := r.URL.Query().Get("vendor")
+	minprice, _ := strconv.ParseFloat(r.URL.Query().Get("minprice"), 64)
+	maxprice, _ := strconv.ParseFloat(r.URL.Query().Get("maxprice"), 64)
+	fmt.Println(canteen, vendor, minprice, maxprice)
+
+	results, err := models.GetAllMenus(canteen, vendor, minprice, maxprice)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			http.Error(w, "Menu not found", http.StatusNotFound)
@@ -27,66 +34,63 @@ func GetAllMenus(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetAllMenusByVendorID(w http.ResponseWriter, r *http.Request) {
-    vars := mux.Vars(r)
-    vendorID := vars["id"]
+	vars := mux.Vars(r)
+	vendorID := vars["id"]
 
-    menus, err := models.GetAllMenusByVendorID(vendorID)
-    if err != nil {
+	menus, err := models.GetAllMenusByVendorID(vendorID)
+	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			http.Error(w, "Menu not found", http.StatusNotFound)
 			return
 		}
-        log.Print(err.Error())
-        http.Error(w, err.Error(), http.StatusInternalServerError)
-        return
-    }
+		log.Print(err.Error())
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 
-    w.Header().Set("Content-Type", "application/json")
-    json.NewEncoder(w).Encode(menus)
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(menus)
 }
-
 
 func GetMenuByID(w http.ResponseWriter, r *http.Request) {
-    vars := mux.Vars(r)
-    menuID := vars["id"]
+	vars := mux.Vars(r)
+	menuID := vars["id"]
 
-    menu, err := models.GetMenuByID(menuID)
-    if err != nil {
-        log.Print(err.Error())
-        http.Error(w, err.Error(), http.StatusInternalServerError)
-        return
-    }
+	menu, err := models.GetMenuByID(menuID)
+	if err != nil {
+		log.Print(err.Error())
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 
-    w.Header().Set("Content-Type", "application/json")
-    json.NewEncoder(w).Encode(menu)
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(menu)
 }
-
 
 func CreateMenu(w http.ResponseWriter, r *http.Request) {
-    var menuRequest models.Menu
-    err := json.NewDecoder(r.Body).Decode(&menuRequest)
-    if err != nil {
-        http.Error(w, err.Error(), http.StatusBadRequest)
-        return
-    }
+	var menuRequest models.Menu
+	err := json.NewDecoder(r.Body).Decode(&menuRequest)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
 
-    err = models.CreateMenu(menuRequest)
-    if err != nil {
-        log.Print(err.Error())
+	err = models.CreateMenu(menuRequest)
+	if err != nil {
+		log.Print(err.Error())
 
-        // Handle the specific error returned from the model
-        if models.IsVendorNotFoundError(err) {
-            http.Error(w, err.Error(), http.StatusBadRequest)
-        } else {
-            http.Error(w, "Database error", http.StatusInternalServerError)
-        }
-        return
-    }
+		// Handle the specific error returned from the model
+		if models.IsVendorNotFoundError(err) {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+		} else {
+			http.Error(w, "Database error", http.StatusInternalServerError)
+		}
+		return
+	}
 
-    w.WriteHeader(http.StatusCreated)
-    fmt.Fprintf(w, "Menu created successfully")
+	w.WriteHeader(http.StatusCreated)
+	fmt.Fprintf(w, "Menu created successfully")
 }
-
 
 func DeleteMenuByID(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)

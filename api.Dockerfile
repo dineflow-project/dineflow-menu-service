@@ -5,13 +5,14 @@ WORKDIR /dineflow-menu-services
 RUN go mod tidy
 RUN go build
 
-FROM golang:1.18-bullseye AS runner
-ENV GIN_MODE release
+# Create a new stage for the final image
+FROM debian:bullseye-slim
+RUN apt-get update && apt-get install -y ca-certificates wget
+RUN wget -O /usr/local/bin/wait-for-it.sh https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh
+RUN chmod +x /usr/local/bin/wait-for-it.sh
 
-RUN mkdir /app
-WORKDIR /app
-COPY --from=builder /dineflow-menu-services/dineflow-menu-services /app
+COPY --from=builder /dineflow-menu-services/dineflow-menu-services /app/dineflow-menu-services
 
 EXPOSE 8090
 
-CMD ["/app/dineflow-menu-services"]
+CMD ["wait-for-it.sh", "db:3306", "--", "/app/dineflow-menu-services"]

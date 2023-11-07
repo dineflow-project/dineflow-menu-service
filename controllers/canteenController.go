@@ -36,11 +36,13 @@ func GetCanteenByID(w http.ResponseWriter, r *http.Request) {
 	canteen, err := models.GetCanteenByID(canteenID)
 	if err != nil {
 		log.Print(err.Error())
+		w.WriteHeader(http.StatusBadRequest)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	// Serialize the canteen information to JSON and send it as the response
+	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(canteen)
 }

@@ -3,6 +3,7 @@ package models
 import (
 	"dineflow-menu-services/configs"
 	"fmt"
+	"strconv"
 
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -46,8 +47,12 @@ func GetAllMenus(canteenName, vendorName string, minprice, maxprice float64) ([]
 
 func GetAllMenusByVendorID(vendorID string) ([]Menu, error) {
 	var menus []Menu
-	if err := configs.Db.Where("vendor_id = ?", vendorID).Find(&menus).Error; err != nil {
-		return nil, err
+	result := configs.Db.Where("vendor_id = ?", vendorID).Find(&menus)
+	if result.RowsAffected == 0 {
+		return nil, fmt.Errorf("the vendor id could not be founded")
+	}
+	if result.Error != nil {
+		return nil, result.Error
 	}
 
 	return menus, nil
@@ -55,7 +60,12 @@ func GetAllMenusByVendorID(vendorID string) ([]Menu, error) {
 
 func GetMenuByID(menuID string) (Menu, error) {
 	var menu Menu
-	result := configs.Db.Where("id = ?", menuID).First(&menu)
+	menuIDint, err := strconv.Atoi(menuID)
+	if err != nil {
+		fmt.Println("Error:", err)
+		return Menu{}, err
+	}
+	result := configs.Db.Where("id = ?", menuIDint).First(&menu)
 	if result.RowsAffected == 0 {
 		return Menu{}, fmt.Errorf("the menu id could not be founded")
 	}

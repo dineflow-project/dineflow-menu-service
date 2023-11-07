@@ -72,7 +72,6 @@ func CreateMenu(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(&menuRequest)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
 	}
 
 	err = models.CreateMenu(menuRequest)
@@ -80,12 +79,12 @@ func CreateMenu(w http.ResponseWriter, r *http.Request) {
 		log.Print(err.Error())
 
 		// Handle the specific error returned from the model
+		w.WriteHeader(http.StatusBadRequest)
 		if models.IsVendorNotFoundError(err) {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 		} else {
 			http.Error(w, "Database error", http.StatusInternalServerError)
 		}
-		return
 	}
 
 	w.WriteHeader(http.StatusCreated)

@@ -15,6 +15,7 @@ import (
 func GetAllVendors(w http.ResponseWriter, r *http.Request) {
 	results, err := models.GetAllVendors()
 	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
 		if err == gorm.ErrRecordNotFound {
 			http.Error(w, "Vendor not found", http.StatusNotFound)
 			return
@@ -33,10 +34,11 @@ func GetVendorByID(w http.ResponseWriter, r *http.Request) {
 	vendor, err := models.GetVendorByID(vendorID)
 	if err != nil {
 		log.Print(err.Error())
+		w.WriteHeader(http.StatusBadRequest)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-
+	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(vendor)
 }
@@ -47,6 +49,7 @@ func GetAllVendorsByCanteenID(w http.ResponseWriter, r *http.Request) {
 
 	menus, err := models.GetAllVendorsByCanteenID(canteenID)
 	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
 		if err == gorm.ErrRecordNotFound {
 			http.Error(w, "Vendor not found", http.StatusNotFound)
 			return
@@ -55,7 +58,7 @@ func GetAllVendorsByCanteenID(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-
+	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(menus)
 }
@@ -70,6 +73,7 @@ func CreateVendor(w http.ResponseWriter, r *http.Request) {
 
 	err = models.CreateVendor(vendorRequest)
 	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
 		if err == gorm.ErrRecordNotFound {
 			http.Error(w, "Cannot create vendor: canteen_id does not exist", http.StatusInternalServerError)
 		} else {
@@ -90,6 +94,7 @@ func DeleteVendorByID(w http.ResponseWriter, r *http.Request) {
 	err := models.DeleteVendorByID(vendorID)
 	if err != nil {
 		log.Print(err.Error())
+		w.WriteHeader(http.StatusBadRequest)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -113,6 +118,7 @@ func UpdateVendorByID(w http.ResponseWriter, r *http.Request) {
 	err := models.UpdateVendorByID(vendorID, updatedVendor)
 	if err != nil {
 		log.Print(err.Error())
+		w.WriteHeader(http.StatusBadRequest)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

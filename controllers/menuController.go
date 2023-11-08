@@ -14,14 +14,23 @@ import (
 )
 
 func GetAllMenus(w http.ResponseWriter, r *http.Request) {
-	canteen := r.URL.Query().Get("canteen")
-	vendor := r.URL.Query().Get("vendor")
+	canteenId := r.URL.Query().Get("canteenId")
+	vendorId := r.URL.Query().Get("vendorId")
+	canteenIdint, err := strconv.Atoi(canteenId)
+	if err != nil {
+		fmt.Println(err)
+	}
+	vendorIdint, err := strconv.Atoi(vendorId)
+	if err != nil {
+		fmt.Println(err)
+	}
 	minprice, _ := strconv.ParseFloat(r.URL.Query().Get("minprice"), 64)
 	maxprice, _ := strconv.ParseFloat(r.URL.Query().Get("maxprice"), 64)
-	fmt.Println(canteen, vendor, minprice, maxprice)
+	fmt.Println(canteenIdint, vendorIdint, minprice, maxprice)
 
-	results, err := models.GetAllMenus(canteen, vendor, minprice, maxprice)
+	results, err := models.GetAllMenus(canteenIdint, vendorIdint, minprice, maxprice)
 	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
 		if err == gorm.ErrRecordNotFound {
 			http.Error(w, "Menu not found", http.StatusNotFound)
 			return
@@ -29,6 +38,7 @@ func GetAllMenus(w http.ResponseWriter, r *http.Request) {
 		log.Print(err.Error())
 		http.Error(w, "Error", http.StatusInternalServerError)
 	}
+	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(results)
 }
@@ -39,6 +49,7 @@ func GetAllMenusByVendorID(w http.ResponseWriter, r *http.Request) {
 
 	menus, err := models.GetAllMenusByVendorID(vendorID)
 	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
 		if err == gorm.ErrRecordNotFound {
 			http.Error(w, "Menu not found", http.StatusNotFound)
 			return
@@ -47,7 +58,7 @@ func GetAllMenusByVendorID(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-
+	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(menus)
 }
@@ -58,11 +69,12 @@ func GetMenuByID(w http.ResponseWriter, r *http.Request) {
 
 	menu, err := models.GetMenuByID(menuID)
 	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
 		log.Print(err.Error())
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-
+	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(menu)
 }

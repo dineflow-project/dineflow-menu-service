@@ -1,7 +1,6 @@
 package models
 
 import (
-	"database/sql"
 	"fmt"
 
 	"dineflow-menu-services/configs"
@@ -18,13 +17,13 @@ const (
 
 type Vendor struct {
 	// gorm.Model
-	ID               int          `json:"id"`
-	CanteenID        int          `json:"canteen_id"`
-	Name             string       `json:"name"`
-	OwnerID          sql.NullBool `json:"owner_id"`
-	OpeningTimestamp string       `json:"opening_timestamp"`
-	ClosingTimestamp string       `json:"closing_timestamp"`
-	Status           Status       `json:"status"`
+	ID               int    `json:"id"`
+	CanteenID        int    `json:"canteen_id"`
+	Name             string `json:"name"`
+	OwnerID          string `json:"owner_id"`
+	OpeningTimestamp string `json:"opening_timestamp"`
+	ClosingTimestamp string `json:"closing_timestamp"`
+	Status           Status `json:"status"`
 }
 
 func GetAllVendors() ([]Vendor, error) {
@@ -36,22 +35,26 @@ func GetAllVendors() ([]Vendor, error) {
 	return vendors, nil
 }
 
-func GetVendorByID(vendorID string) ([]Vendor, error) {
-	var vendor []Vendor
+func GetVendorByID(vendorID string) (Vendor, error) {
+	var vendor Vendor
 	result := configs.Db.Where("id = ?", vendorID).First(&vendor)
 	if result.RowsAffected == 0 {
-		return nil, fmt.Errorf("the vendor id could not be found")
+		return Vendor{}, fmt.Errorf("the vendor id could not be found")
 	}
 	if result.Error != nil {
-		return nil, result.Error
+		return Vendor{}, result.Error
 	}
 	return vendor, nil
 }
 
 func GetAllVendorsByCanteenID(canteenID string) ([]Vendor, error) {
 	var vendor []Vendor
-	if err := configs.Db.Where("canteen_id = ?", canteenID).Find(&vendor).Error; err != nil {
-		return nil, err
+	result := configs.Db.Where("canteen_id = ?", canteenID).Find(&vendor)
+	if result.RowsAffected == 0 {
+		return nil, fmt.Errorf("the canteen id could not be found")
+	}
+	if result.Error != nil {
+		return nil, result.Error
 	}
 
 	return vendor, nil

@@ -18,18 +18,18 @@ type Menu struct {
 	IsAvailable bool    `json:"is_available"`
 }
 
-func GetAllMenus(canteenName, vendorName string, minprice, maxprice float64) ([]Menu, error) {
+func GetAllMenus(canteenId, vendorId int, minprice, maxprice float64) ([]Menu, error) {
 	var menus []Menu
 	query := configs.Db.Table("menus").
 		Select("menus.*").
 		Joins("join vendors on menus.vendor_id = vendors.id").
 		Joins("join canteens on vendors.canteen_id = canteens.id")
 
-	if canteenName != "" {
-		query = query.Where("canteens.name = ?", canteenName)
+	if canteenId > 0 {
+		query = query.Where("canteens.id = ?", canteenId)
 	}
-	if vendorName != "" {
-		query = query.Where("vendors.name = ?", vendorName)
+	if vendorId > 0 {
+		query = query.Where("menus.vendor_id = ?", vendorId)
 	}
 	if minprice > 0 {
 		query = query.Where("menus.price >= ?", minprice)

@@ -15,4 +15,4 @@ COPY --from=builder /dineflow-menu-services/dineflow-menu-services /app/dineflow
 
 EXPOSE 8090
 
-CMD ["wait-for-it.sh", "db:3306", "--", "/app/dineflow-menu-services"]
+CMD ["wait-for-it.sh", "menu_db:3306", "--", "/app/dineflow-menu-services"]

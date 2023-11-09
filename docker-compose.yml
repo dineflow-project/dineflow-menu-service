@@ -1,46 +1,41 @@
 version: "3.7"
 
 services:
-  db:
+  menu_db:
     container_name: "menu_services_db"
     hostname: "menu_services_db"
     platform: linux/x86_64
     build:
       context: .
       dockerfile: db.Dockerfile
-    # image: mysql:8.0.23
     networks:
       - menu_network
     ports:
-      # <Port exposed> : < MySQL Port running inside container>
       - "3306:3306"
     env_file:
       - ./.env
 
     volumes:
-      - database:/var/lib/mysql
-    # command: --default-authentication-plugin=caching_sha2_password
-    # command: --bind-address=0.0.0.0
-  api:
+      - menu_database:/var/lib/mysql
+  menu_api:
     container_name: "menu_services_api"
     build:
       context: .
       dockerfile: api.Dockerfile
-    # command: go run main.go
     restart: on-failure
     networks:
       - menu_network
     ports:
       - "8090:8090"
     depends_on:
-      - db
+      - menu_db
     env_file:
           - ./.env
     volumes:
-      - api:/usr/src/app/
+      - menu_api:/usr/src/app/
 
 networks:
   menu_network:
 volumes:
-  database:
-  api:
+  menu_database:
+  menu_api:

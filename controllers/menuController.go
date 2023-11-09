@@ -16,6 +16,12 @@ import (
 func GetAllMenus(w http.ResponseWriter, r *http.Request) {
 	canteenId := r.URL.Query().Get("canteenId")
 	vendorId := r.URL.Query().Get("vendorId")
+	if canteenId == "" {
+		canteenId = "-1"
+	}
+	if vendorId == "" {
+		vendorId = "-1"
+	}
 	canteenIdint, err := strconv.Atoi(canteenId)
 	if err != nil {
 		fmt.Println(err)
@@ -38,6 +44,7 @@ func GetAllMenus(w http.ResponseWriter, r *http.Request) {
 		log.Print(err.Error())
 		http.Error(w, "Error", http.StatusInternalServerError)
 	}
+
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(results)

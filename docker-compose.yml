@@ -4,7 +4,6 @@ services:
   menu_db:
     container_name: "menu_services_db"
     hostname: "menu_services_db"
-    platform: linux/x86_64
     build:
       context: .
       dockerfile: db.Dockerfile

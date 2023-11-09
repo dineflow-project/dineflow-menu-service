@@ -50,9 +50,9 @@ func GetVendorByID(vendorID string) (Vendor, error) {
 func GetAllVendorsByCanteenID(canteenID string) ([]Vendor, error) {
 	var vendor []Vendor
 	result := configs.Db.Where("canteen_id = ?", canteenID).Find(&vendor)
-	if result.RowsAffected == 0 {
-		return nil, fmt.Errorf("the canteen id could not be found")
-	}
+	// if result.RowsAffected == 0 {
+	// 	return nil, fmt.Errorf("the canteen id could not be found")
+	// }
 	if result.Error != nil {
 		return nil, result.Error
 	}

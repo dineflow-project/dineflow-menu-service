@@ -43,6 +43,22 @@ func GetVendorByID(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(vendor)
 }
 
+func GetVendorByOwnerId(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	vendorID := vars["id"]
+
+	vendor, err := models.GetVendorByOwnerId(vendorID)
+	if err != nil {
+		log.Print(err.Error())
+		w.WriteHeader(http.StatusBadRequest)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(vendor)
+}
+
 func GetAllVendorsByCanteenID(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	canteenID := vars["id"]

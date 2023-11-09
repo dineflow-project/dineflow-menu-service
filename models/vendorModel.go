@@ -47,6 +47,18 @@ func GetVendorByID(vendorID string) (Vendor, error) {
 	return vendor, nil
 }
 
+func GetVendorByOwnerId(vendorID string) (Vendor, error) {
+	var vendor Vendor
+	result := configs.Db.Where("owner_id = ?", vendorID).First(&vendor)
+	if result.RowsAffected == 0 {
+		return Vendor{}, fmt.Errorf("the owner id could not be found")
+	}
+	if result.Error != nil {
+		return Vendor{}, result.Error
+	}
+	return vendor, nil
+}
+
 func GetAllVendorsByCanteenID(canteenID string) ([]Vendor, error) {
 	var vendor []Vendor
 	result := configs.Db.Where("canteen_id = ?", canteenID).Find(&vendor)

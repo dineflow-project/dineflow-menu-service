@@ -17,6 +17,7 @@ func ProtectedRoute(r *mux.Router) {
 
 	r.HandleFunc("/vendors", controllers.GetAllVendors).Methods("GET")
 	r.HandleFunc("/vendors/{id:[0-9]+}", controllers.GetVendorByID).Methods("GET")
+	r.HandleFunc("/vendors/byOwner/{id:[a-zA-Z0-9]+}", controllers.GetVendorByOwnerId).Methods("GET")
 	r.HandleFunc("/vendors/canteens/{id:[0-9]+}", controllers.GetAllVendorsByCanteenID).Methods("GET")
 	r.HandleFunc("/vendors", controllers.CreateVendor).Methods("POST")
 	r.HandleFunc("/vendors/{id:[0-9]+}", controllers.UpdateVendorByID).Methods("PUT", "PATCH")

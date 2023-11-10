@@ -16,7 +16,6 @@ const (
 )
 
 type Vendor struct {
-	// gorm.Model
 	ID               int    `json:"id"`
 	CanteenID        int    `json:"canteen_id"`
 	Name             string `json:"name"`
@@ -24,6 +23,7 @@ type Vendor struct {
 	OpeningTimestamp string `json:"opening_timestamp"`
 	ClosingTimestamp string `json:"closing_timestamp"`
 	Status           Status `json:"status"`
+	Image_path       string `json:"image_path"`
 }
 
 func GetAllVendors() ([]Vendor, error) {
@@ -98,12 +98,18 @@ func DeleteVendorByID(vendorID string) error {
 }
 
 func UpdateVendorByID(vendorID string, updatedVendor Vendor) error {
+	fmt.Println(updatedVendor)
+	var existingVendor Vendor
+	find_result := configs.Db.First(&existingVendor, "ID = ?", vendorID)
+	if find_result.RowsAffected == 0 {
+		return fmt.Errorf("the vendor id could not be found")
+	}
+	if find_result.Error != nil {
+		return find_result.Error
+	}
 	result := configs.Db.Model(&Vendor{}).Where("id = ?", vendorID).Updates(updatedVendor)
 	if result.Error != nil {
 		return result.Error
-	}
-	if result.RowsAffected == 0 {
-		return fmt.Errorf("the vendor id could not be found")
 	}
 
 	return nil

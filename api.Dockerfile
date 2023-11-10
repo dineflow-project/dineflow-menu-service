@@ -1,4 +1,4 @@
-FROM golang:1.18-bullseye AS builder
+FROM golang:1.21-bullseye AS builder
 
 COPY . /dineflow-menu-services
 WORKDIR /dineflow-menu-services

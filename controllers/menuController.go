@@ -32,7 +32,7 @@ func GetAllMenus(w http.ResponseWriter, r *http.Request) {
 	}
 	minprice, _ := strconv.ParseFloat(r.URL.Query().Get("minprice"), 64)
 	maxprice, _ := strconv.ParseFloat(r.URL.Query().Get("maxprice"), 64)
-	fmt.Println(canteenIdint, vendorIdint, minprice, maxprice)
+	// fmt.Println(canteenIdint, vendorIdint, minprice, maxprice)
 
 	results, err := models.GetAllMenus(canteenIdint, vendorIdint, minprice, maxprice)
 	if err != nil {
@@ -119,6 +119,7 @@ func DeleteMenuByID(w http.ResponseWriter, r *http.Request) {
 	err := models.DeleteMenuByID(menuID)
 	if err != nil {
 		log.Print(err.Error())
+		w.WriteHeader(http.StatusBadRequest)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -142,6 +143,7 @@ func UpdateMenuByID(w http.ResponseWriter, r *http.Request) {
 	err := models.UpdateMenuByID(menuID, updatedMenu)
 	if err != nil {
 		log.Print(err.Error())
+		w.WriteHeader(http.StatusBadRequest)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

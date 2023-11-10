@@ -8,9 +8,9 @@ import (
 )
 
 type Canteen struct {
-	// gorm.Model
-	ID   int    `json:"id"`
-	Name string `json:"name"`
+	ID         int    `json:"id"`
+	Name       string `json:"name"`
+	Image_path string `json:"image_path"`
 }
 
 func GetAllCanteens() ([]Canteen, error) {
@@ -55,12 +55,20 @@ func DeleteCanteenByID(canteenID string) error {
 }
 
 func UpdateCanteenByID(canteenID string, updatedCanteen Canteen) error {
+	// Check if the canteen with the given ID exists
+	var existingCanteen Canteen
+	find_result := configs.Db.First(&existingCanteen, "ID = ?", canteenID)
+	if find_result.RowsAffected == 0 {
+		return fmt.Errorf("the canteen id could not be found")
+	}
+	if find_result.Error != nil {
+		return find_result.Error
+	}
+	fmt.Println(updatedCanteen)
+
 	result := configs.Db.Model(&Canteen{}).Where("ID = ?", canteenID).Updates(updatedCanteen)
 	if result.Error != nil {
 		return result.Error
-	}
-	if result.RowsAffected == 0 {
-		return fmt.Errorf("the canteen id could not be found")
 	}
 	return nil
 }

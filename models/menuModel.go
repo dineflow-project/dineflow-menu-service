@@ -9,13 +9,13 @@ import (
 )
 
 type Menu struct {
-	ID          int     `json:"id"`
-	VendorID    int     `json:"vendor_id"`
-	Name        string  `json:"name"`
-	Price       float32 `json:"price"`
-	ImagePath   string  `json:"image_path"`
-	Description string  `json:"description"`
-	IsAvailable bool    `json:"is_available"`
+	ID           int     `json:"id"`
+	VendorID     int     `json:"vendor_id"`
+	Name         string  `json:"name"`
+	Price        float32 `json:"price"`
+	Image_path   string  `json:"image_path"`
+	Description  string  `json:"description"`
+	Is_available int     `json:"is_available"`
 }
 
 func GetAllMenus(canteenId, vendorId int, minprice, maxprice float64) ([]Menu, error) {
@@ -120,18 +120,20 @@ func DeleteMenuByID(menuID string) error {
 }
 
 func UpdateMenuByID(menuID string, updatedMenu Menu) error {
-	menuIDint, err := strconv.Atoi(menuID)
-	if err != nil {
-		fmt.Println("Error:", err)
-		return err
+	var existingMenu Menu
+	find_result := configs.Db.First(&existingMenu, "ID = ?", menuID)
+	if find_result.RowsAffected == 0 {
+		return fmt.Errorf("the menu id could not be found")
 	}
-	fmt.Println("menuIDint", menuIDint)
-	result := configs.Db.Model(&Menu{}).Where("id = ?", menuIDint).Updates(updatedMenu)
+	if find_result.Error != nil {
+		return find_result.Error
+	}
+	fmt.Println(existingMenu)
+	fmt.Println(updatedMenu)
+	result := configs.Db.Model(&Menu{}).Where("id = ?", menuID).Updates(updatedMenu)
+	// fmt.Println("result", result)
 	if result.Error != nil {
 		return result.Error
-	}
-	if result.RowsAffected == 0 {
-		return fmt.Errorf("the menu id could not be founded")
 	}
 
 	return nil

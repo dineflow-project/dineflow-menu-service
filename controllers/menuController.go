@@ -93,7 +93,7 @@ func CreateMenu(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 	}
 
-	err = models.CreateMenu(menuRequest)
+	menu, err := models.CreateMenu(menuRequest)
 	if err != nil {
 		log.Print(err.Error())
 
@@ -104,10 +104,12 @@ func CreateMenu(w http.ResponseWriter, r *http.Request) {
 		} else {
 			http.Error(w, "Database error", http.StatusInternalServerError)
 		}
+	} else {
+		w.WriteHeader(http.StatusCreated)
+		// fmt.Fprintf(w, "Menu created successfully")
+		json.NewEncoder(w).Encode(menu)
 	}
 
-	w.WriteHeader(http.StatusCreated)
-	fmt.Fprintf(w, "Menu created successfully")
 }
 
 func DeleteMenuByID(w http.ResponseWriter, r *http.Request) {

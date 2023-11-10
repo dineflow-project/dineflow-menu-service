@@ -89,21 +89,21 @@ func IsVendorNotFoundError(err error) bool {
 	return ok
 }
 
-func CreateMenu(menu Menu) error {
+func CreateMenu(menu Menu) (Menu, error) {
 	// Check if the vendor exists
 	var vendorCount int64
 	if err := configs.Db.Model(&Vendor{}).Where("id = ?", menu.VendorID).Count(&vendorCount).Error; err != nil {
-		return err
+		return Menu{}, err
 	}
 
 	if vendorCount == 0 {
 		// Return a specific error indicating that the vendor does not exist
-		return VendorNotFoundError{VendorID: menu.VendorID}
+		return Menu{}, VendorNotFoundError{VendorID: menu.VendorID}
 	}
 
 	// The vendor exists, so create the menu item
 	err := configs.Db.Create(&menu).Error
-	return err
+	return menu, err
 }
 
 func DeleteMenuByID(menuID string) error {
@@ -120,7 +120,13 @@ func DeleteMenuByID(menuID string) error {
 }
 
 func UpdateMenuByID(menuID string, updatedMenu Menu) error {
-	result := configs.Db.Model(&Menu{}).Where("id = ?", menuID).Updates(updatedMenu)
+	menuIDint, err := strconv.Atoi(menuID)
+	if err != nil {
+		fmt.Println("Error:", err)
+		return err
+	}
+	fmt.Println("menuIDint", menuIDint)
+	result := configs.Db.Model(&Menu{}).Where("id = ?", menuIDint).Updates(updatedMenu)
 	if result.Error != nil {
 		return result.Error
 	}

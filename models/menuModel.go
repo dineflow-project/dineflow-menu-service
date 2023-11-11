@@ -15,7 +15,7 @@ type Menu struct {
 	Price        float32 `json:"price"`
 	Image_path   string  `json:"image_path"`
 	Description  string  `json:"description"`
-	Is_available int     `json:"is_available"`
+	Is_available string  `json:"is_available"`
 }
 
 func GetAllMenus(canteenId, vendorId int, minprice, maxprice float64) ([]Menu, error) {

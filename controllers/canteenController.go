@@ -21,8 +21,10 @@ func GetAllCanteens(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		log.Print(err.Error())
+		w.WriteHeader(http.StatusBadRequest)
 		http.Error(w, "Error", http.StatusInternalServerError)
 	}
+	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(results)
 }
@@ -36,11 +38,13 @@ func GetCanteenByID(w http.ResponseWriter, r *http.Request) {
 	canteen, err := models.GetCanteenByID(canteenID)
 	if err != nil {
 		log.Print(err.Error())
+		w.WriteHeader(http.StatusBadRequest)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	// Serialize the canteen information to JSON and send it as the response
+	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(canteen)
 }
@@ -58,6 +62,7 @@ func CreateCanteen(w http.ResponseWriter, r *http.Request) {
 	err := models.CreateCanteen(newCanteen)
 	if err != nil {
 		log.Print(err.Error())
+		w.WriteHeader(http.StatusBadRequest)
 		http.Error(w, "Database error", http.StatusInternalServerError)
 		return
 	}
@@ -74,6 +79,7 @@ func DeleteCanteenByID(w http.ResponseWriter, r *http.Request) {
 	err := models.DeleteCanteenByID(canteenID)
 	if err != nil {
 		log.Print(err.Error())
+		w.WriteHeader(http.StatusBadRequest)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -100,6 +106,7 @@ func UpdateCanteenByID(w http.ResponseWriter, r *http.Request) {
 	err := models.UpdateCanteenByID(canteenID, updatedCanteen)
 	if err != nil {
 		log.Print(err.Error())
+		w.WriteHeader(http.StatusBadRequest)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

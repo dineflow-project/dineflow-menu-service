@@ -1,7 +1,6 @@
 package models
 
 import (
-	"database/sql"
 	"fmt"
 
 	"dineflow-menu-services/configs"
@@ -17,14 +16,14 @@ const (
 )
 
 type Vendor struct {
-	// gorm.Model
-	ID               int          `json:"id"`
-	CanteenID        int          `json:"canteen_id"`
-	Name             string       `json:"name"`
-	OwnerID          sql.NullBool `json:"owner_id"`
-	OpeningTimestamp string       `json:"opening_timestamp"`
-	ClosingTimestamp string       `json:"closing_timestamp"`
-	Status           Status       `json:"status"`
+	ID               int    `json:"id"`
+	CanteenID        int    `json:"canteen_id"`
+	Name             string `json:"name"`
+	OwnerID          string `json:"owner_id"`
+	OpeningTimestamp string `json:"opening_timestamp"`
+	ClosingTimestamp string `json:"closing_timestamp"`
+	Status           Status `json:"status"`
+	Image_path       string `json:"image_path"`
 }
 
 func GetAllVendors() ([]Vendor, error) {
@@ -48,7 +47,36 @@ func GetVendorByID(vendorID string) (Vendor, error) {
 	return vendor, nil
 }
 
+func GetVendorByOwnerId(vendorID string) (Vendor, error) {
+	var vendor Vendor
+	result := configs.Db.Where("owner_id = ?", vendorID).First(&vendor)
+	if result.RowsAffected == 0 {
+		return Vendor{}, fmt.Errorf("the owner id could not be found")
+	}
+	if result.Error != nil {
+		return Vendor{}, result.Error
+	}
+	return vendor, nil
+}
+
+func GetAllVendorsByCanteenID(canteenID string) ([]Vendor, error) {
+	var vendor []Vendor
+	result := configs.Db.Where("canteen_id = ?", canteenID).Find(&vendor)
+	// if result.RowsAffected == 0 {
+	// 	return nil, fmt.Errorf("the canteen id could not be found")
+	// }
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return vendor, nil
+}
+
 func CreateVendor(vendor Vendor) error {
+	var canteen Canteen
+	if err := configs.Db.Where("id = ?", vendor.CanteenID).First(&canteen).Error; err != nil {
+		return err
+	}
 	err := configs.Db.Create(&vendor).Error
 	if err != nil {
 		return err
@@ -70,12 +98,18 @@ func DeleteVendorByID(vendorID string) error {
 }
 
 func UpdateVendorByID(vendorID string, updatedVendor Vendor) error {
+	fmt.Println(updatedVendor)
+	var existingVendor Vendor
+	find_result := configs.Db.First(&existingVendor, "ID = ?", vendorID)
+	if find_result.RowsAffected == 0 {
+		return fmt.Errorf("the vendor id could not be found")
+	}
+	if find_result.Error != nil {
+		return find_result.Error
+	}
 	result := configs.Db.Model(&Vendor{}).Where("id = ?", vendorID).Updates(updatedVendor)
 	if result.Error != nil {
 		return result.Error
-	}
-	if result.RowsAffected == 0 {
-		return fmt.Errorf("the vendor id could not be found")
 	}
 
 	return nil

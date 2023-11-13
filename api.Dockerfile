@@ -1,25 +1,18 @@
-FROM golang:1.18-alpine
-WORKDIR /app
+FROM golang:1.21-bullseye AS builder
 
-# add some necessary packages
-RUN apk update && \
-    apk add libc-dev && \
-    apk add gcc && \
-    apk add make
+COPY . /dineflow-menu-services
+WORKDIR /dineflow-menu-services
+RUN go mod tidy
+RUN go build
 
-# prevent the re-installation of vendors at every change in the source code
-COPY ./go.mod go.sum ./
-RUN go mod download && go mod verify
+# Create a new stage for the final image
+FROM debian:bullseye-slim
+RUN apt-get update && apt-get install -y ca-certificates wget
+RUN wget -O /usr/local/bin/wait-for-it.sh https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh
+RUN chmod +x /usr/local/bin/wait-for-it.sh
 
-# Install Compile Daemon for go. We'll use it to watch changes in go files
-RUN go install -mod=mod github.com/githubnemo/CompileDaemon
+COPY --from=builder /dineflow-menu-services/dineflow-menu-services /app/dineflow-menu-services
 
-# Copy and build the app
-COPY . .
-COPY ./entrypoint.sh /entrypoint.sh
+EXPOSE 8090
 
-# wait-for-it requires bash, which alpine doesn't ship with by default. Use wait-for instead
-ADD https://raw.githubusercontent.com/eficode/wait-for/v2.1.0/wait-for /usr/local/bin/wait-for
-RUN chmod +rx /usr/local/bin/wait-for /entrypoint.sh
-
-ENTRYPOINT [ "sh", "/entrypoint.sh" ]
+CMD ["wait-for-it.sh", "menu_db:3306", "--", "/app/dineflow-menu-services"]

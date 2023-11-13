@@ -5,7 +5,6 @@ import (
 	"log"
 	"os"
 
-	_ "github.com/go-sql-driver/mysql"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
@@ -18,7 +17,8 @@ func ConnectDB() {
 	Db, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
 		log.Print(err.Error())
+	} else {
+		fmt.Println("Connected to MySQL")
 	}
 
-	fmt.Println("Connected to MySQL")
 }

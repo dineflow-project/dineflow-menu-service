@@ -1,4 +1,4 @@
 # start with base image
-FROM mysql:8.0.23
+FROM mysql:latest
 
 COPY ./database/*.sql /docker-entrypoint-initdb.d/

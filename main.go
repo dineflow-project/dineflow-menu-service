@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"runtime"
 
 	"dineflow-menu-services/configs"
 	"dineflow-menu-services/models"
@@ -23,12 +24,17 @@ func main() {
 	}
 
 	configs.ConnectDB()
-	if err := models.AutoMigrateDB(); err != nil {
-		log.Fatal("Database migration error:", err)
+	if errMg := models.AutoMigrateDB(); errMg != nil {
+		log.Fatal("Database migration error:", errMg)
 	}
 
 	router := mux.NewRouter()
 	routes.ProtectedRoute(router)
-	log.Fatal(http.ListenAndServe(":"+os.Getenv("PORT"), nil))
 
+	local_os := runtime.GOOS
+	if local_os == "windows" {
+		log.Fatal(http.ListenAndServe("127.0.0.1:"+os.Getenv("PORT"), nil))
+	} else {
+		log.Fatal(http.ListenAndServe(":"+os.Getenv("PORT"), nil))
+	}
 }
